@@ -5,7 +5,7 @@
     <groupId>at.pavlov</groupId>
     <artifactId>Cannons</artifactId>
     <name>Cannons</name>
-    <version>2.5.13</version>
+    <version>2.5.13-mcpd</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -115,7 +115,7 @@
     </developers>
 
     <build>
-        <finalName>${project.name}</finalName>
+        <finalName>${project.name}-${project.version}</finalName>
         <defaultGoal>clean install</defaultGoal>
         <!-- Resources -->
         <resources>
