@@ -467,4 +467,8 @@ public final class Cannons extends JavaPlugin
 	public String getWhitelistDatabase() {
 		return whitelistDatabase;
 	}
+
+	public String getSignLine2Type() {
+		return config.getSignLine2Type();
+	}
 }
