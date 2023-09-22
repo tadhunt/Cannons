@@ -7,6 +7,9 @@ general:
   claimEdgeLength: 60
   # don't use an economy plugin, even if it is installed
   economyDisabled: false
+  # What to show on line 2 of cannon signs
+  #   accepted values: 'owner' (default), or 'state' (Ready)
+  signLine2Type: owner
 
 
 cannonLimits:

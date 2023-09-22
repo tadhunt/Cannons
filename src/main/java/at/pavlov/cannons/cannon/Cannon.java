@@ -1627,22 +1627,30 @@ public class Cannon
      */
     public String getSignString(int index)
     {
-
         switch (index)
         {
-
             case 0 :
                 // Cannon name in the first line
                 if (cannonName == null) cannonName = "missing Name";
                 return cannonName;
             case 1 :
-                // Cannon owner in the second
-                if (owner == null)
-                    return "missing Owner";
-                OfflinePlayer bPlayer = Bukkit.getOfflinePlayer(owner);
-                if (bPlayer == null || !bPlayer.hasPlayedBefore())
-                    return "not found";
-                return bPlayer.getName();
+                String stype = Cannons.getPlugin().getSignLine2Type();
+                if (stype.equals("owner")) {
+                    // Cannon owner in the second
+                    if (owner == null)
+                        return "missing Owner";
+                    OfflinePlayer bPlayer = Bukkit.getOfflinePlayer(owner);
+                    if (bPlayer == null || !bPlayer.hasPlayedBefore())
+                        return "not found";
+                    return bPlayer.getName();
+                }
+                if (stype.equals("state")) {
+                    if (owner == null) {
+                            return "no owner";
+                    }
+                    return "Ready";
+                }
+                break;
             case 2 :
                 // loaded Gunpowder/Projectile
                 if (loadedProjectile != null) return "p: " + loadedGunpowder + " c: " + loadedProjectile.getMaterialInformation();

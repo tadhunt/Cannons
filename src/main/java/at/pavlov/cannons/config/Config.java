@@ -32,6 +32,7 @@ public class Config
     private boolean relayExplosionEvent;
     private int claimEdgeLength;
     private boolean economyDisabled;
+    private String signLine2Type;
 	
 	//build limits
 	private boolean buildLimitEnabled;
@@ -121,6 +122,9 @@ public class Config
         setRelayExplosionEvent(plugin.getConfig().getBoolean("general.relayExplosionEvent", false));
         setClaimEdgeLength(plugin.getConfig().getInt("general.claimEdgeLength", 60));
 		setEconomyDisabled(plugin.getConfig().getBoolean("general.economyDisabled", false));
+        setSignLine2Type(plugin.getConfig().getString("general.signLine2Type", "owner"));
+
+        plugin.logDebug(String.format("config: economy %s", this.economyDisabled() ? "disabled" : "enabled"));
 		
 		//limitOfCannons
 		setBuildLimitEnabled(plugin.getConfig().getBoolean("cannonLimits.useLimits", true));
@@ -569,11 +573,27 @@ public class Config
     }
 
     public void setEconomyDisabled(boolean disabled) {
-        this.economyDisabled = true;
+        this.economyDisabled = disabled;
     }
 
     public boolean economyDisabled() {
         return this.economyDisabled;
+    }
+
+    public void setSignLine2Type(String value) {
+        value = value.toLowerCase();
+
+        if (value.equals("owner") || value.equals("state")) {
+            this.signLine2Type = value;
+            return;
+        }
+
+        plugin.logSevere(String.format("general.signLine2Type: bad value '%s', setting to 'owner'", value));
+        this.signLine2Type = "owner";
+    }
+
+    public String getSignLine2Type() {
+        return this.signLine2Type;
     }
 
     public double getToolAutoaimRange() {
