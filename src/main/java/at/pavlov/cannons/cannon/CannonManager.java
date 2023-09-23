@@ -551,7 +551,7 @@ public class CannonManager
                 if (message == MessageEnum.CannonCreated && (cannon.getCannonDesign().isSignRequired() && !cannon.hasCannonSign()))
                     message = MessageEnum.ErrorMissingSign;
 
-                plugin.logDebug("CannonBeforeCreateEvent Cannon: " + cannon + "message: " + message + " player: " + player);
+                plugin.logDebug("CannonBeforeCreateEvent Cannon: " + cannon + " message: " + message + " player: " + player);
                 plugin.logDebug("player.getUniqueId(): " + player.getUniqueId());
 
                 CannonBeforeCreateEvent cbceEvent = new CannonBeforeCreateEvent(cannon, message, player.getUniqueId());

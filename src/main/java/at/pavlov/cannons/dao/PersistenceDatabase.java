@@ -12,9 +12,9 @@ public class PersistenceDatabase
 	private Cannons plugin;
 	private BukkitTask saveTask = null;
 
-	public PersistenceDatabase(Cannons _plugin)
+	public PersistenceDatabase(Cannons plugin)
 	{
-		plugin = _plugin;
+		this.plugin = plugin;
 	}
 
 	public void createTables(){
@@ -35,7 +35,7 @@ public class PersistenceDatabase
         }
 		plugin.getCannonManager().clearCannonList();
 
-	    LoadCannonTask task = new LoadCannonTask();
+	    LoadCannonTask task = new LoadCannonTask(plugin);
 	    task.runTaskAsynchronously(plugin);
 	}
 

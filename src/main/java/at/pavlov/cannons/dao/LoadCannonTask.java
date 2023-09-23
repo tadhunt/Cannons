@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class LoadCannonTask extends BukkitRunnable{
-    public LoadCannonTask(){
+    private final Cannons plugin;
 
+    public LoadCannonTask(Cannons plugin) {
+        this.plugin = plugin;
     }
 
     @Override
@@ -30,20 +32,20 @@ public class LoadCannonTask extends BukkitRunnable{
         ArrayList<UUID> invalid = new ArrayList<UUID>();
         int i = 0;
 
-        try (Statement statement = Cannons.getPlugin().getConnection().createStatement()) {
+        try (Statement statement = plugin.getConnection().createStatement()) {
             // create a query that returns CannonBean
 
             ResultSet rs = statement.executeQuery(
-                    String.format("SELECT * FROM %s", Cannons.getPlugin().getCannonDatabase())
+                    String.format("SELECT * FROM %s", plugin.getCannonDatabase())
             );
 
             // found cannons - load them
             while (rs.next()) {
                 UUID cannon_id = UUID.fromString(rs.getString("id"));
                 //check if cannon design exists
-                CannonDesign design = Cannons.getPlugin().getCannonDesign(rs.getString("design_id"));
+                CannonDesign design = plugin.getCannonDesign(rs.getString("design_id"));
                 if (design == null) {
-                    Cannons.getPlugin().logDebug("Design " + rs.getString("design_id") + " not found in plugin/designs");
+                    plugin.logSevere("Design " + rs.getString("design_id") + " not found in plugin/designs");
                     invalid.add(cannon_id);
                     //deleteCannon(bean.getId());
                 } else {
@@ -53,30 +55,40 @@ public class LoadCannonTask extends BukkitRunnable{
                     World w = Bukkit.getWorld(world);
 
                     if (w == null) {
-                        Cannons.getPlugin().logDebug("World of cannon " + cannon_id + " is not valid");
+                        plugin.logSevere("World of cannon " + cannon_id + " is not valid");
                         invalid.add(cannon_id);
                         continue;
                     }
                     String owner_str = rs.getString("owner");
                     if (owner_str == null) {
-                        Cannons.getPlugin().logDebug("Owner of cannon " + cannon_id + " is null");
+                        plugin.logSevere("Owner of cannon " + cannon_id + " is null");
                         invalid.add(cannon_id);
                         continue;
                     }
                     UUID owner = UUID.fromString(owner_str);
                     boolean isBanned = false;
                     for (OfflinePlayer oplayer : Bukkit.getServer().getBannedPlayers()) {
-                        if (oplayer.getUniqueId().equals(owner))
+                        if (oplayer.getUniqueId().equals(owner)) {
                             isBanned = true;
+                            break;
+                        }
                     }
-                    if (!Bukkit.getOfflinePlayer(owner).hasPlayedBefore() || isBanned) {
-                        if (isBanned)
-                            Cannons.getPlugin().logDebug("Owner of cannon " + cannon_id + " was banned");
-                        else
-                            Cannons.getPlugin().logDebug("Owner of cannon " + cannon_id + " does not exist");
+
+                    if (isBanned) {
+                        plugin.logSevere("Owner of cannon " + cannon_id + " was banned");
                         invalid.add(cannon_id);
                         continue;
                     }
+
+                    /*
+                     * NOTE(tadhunt): Deleting the cannon just because the previous owner no longer exists on this server isn't cool.
+                     *
+                    if (!Bukkit.getOfflinePlayer(owner).hasPlayedBefore()) {
+                        plugin.logSevere("Owner of cannon " + cannon_id + " does not exist");
+                        invalid.add(cannon_id);
+                        continue;
+                    }
+                    */
 
                     Vector offset = new Vector(rs.getInt("loc_x"), rs.getInt("loc_y"), rs.getInt("loc_z"));
                     BlockFace cannonDirection = BlockFace.valueOf(rs.getString("cannon_direction"));
@@ -115,7 +127,7 @@ public class LoadCannonTask extends BukkitRunnable{
                     cannon.setPaid(rs.getBoolean("paid"));
 
                     //add a cannon to the cannon list
-                    BukkitTask task = new CreateCannon(Cannons.getPlugin(), cannon, false).runTask(Cannons.getPlugin());
+                    BukkitTask task = new CreateCannon(plugin, cannon, false).runTask(plugin);
                     //plugin.createCannon(cannon);
                     i++;
                 }
@@ -126,18 +138,17 @@ public class LoadCannonTask extends BukkitRunnable{
         }
 
         //delete invalid cannons
-        try (Statement statement = Cannons.getPlugin().getConnection().createStatement()) {
+        try (Statement statement = plugin.getConnection().createStatement()) {
 
             for (UUID inv : invalid) {
-                statement.addBatch(String.format("DELETE FROM %s WHERE id='%s'", Cannons.getPlugin().getCannonDatabase(), inv.toString()));
-                Cannons.getPlugin().logDebug("Delete cannon " + inv);
+                statement.addBatch(String.format("DELETE FROM %s WHERE id='%s'", plugin.getCannonDatabase(), inv.toString()));
+                plugin.logSevere("Delete cannon " + inv);
             }
             statement.executeBatch();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Cannons.getPlugin().logDebug(i + " cannons loaded from the database");
-
+        plugin.logDebug(i + " cannons loaded from the database");
     }
 }
