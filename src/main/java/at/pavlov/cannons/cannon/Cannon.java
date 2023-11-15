@@ -631,7 +631,11 @@ public class Cannon
      * @return true if the player and cannons can load the projectile
      */
     private MessageEnum CheckPermProjectile(Projectile projectile, UUID playerUid) {
-        return CheckPermProjectile(projectile, Bukkit.getPlayer(playerUid));
+        Player player = null;
+        if (playerUid != null) {
+            player = Bukkit.getPlayer(playerUid);
+        }
+        return CheckPermProjectile(projectile, player);
     }
 
     /**
