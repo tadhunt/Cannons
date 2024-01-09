@@ -147,9 +147,15 @@ public class ProjectileObserver {
         Projectile projectile = cannonball.getProjectile();
         if (projectile.hasProperty(ProjectileProperties.HUMAN_CANNONBALL) || projectile.hasProperty(ProjectileProperties.OBSERVER))
         {
-            Player shooter = Bukkit.getPlayer(cannonball.getShooterUID());
-            if(shooter == null)
+            UUID shooterUUID = cannonball.getShooterUID();
+            if (shooterUUID == null) {
                 return;
+            }
+
+            Player shooter = Bukkit.getPlayer(shooterUUID);
+            if(shooter == null) {
+                return;
+            }
 
             //set some distance to the snowball to prevent a collision
             Location optiLoc = projectile_entity.getLocation().clone().subtract(projectile_entity.getVelocity().normalize().multiply(20.0));

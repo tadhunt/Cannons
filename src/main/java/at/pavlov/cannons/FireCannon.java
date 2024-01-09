@@ -163,11 +163,17 @@ public class FireCannon {
     public MessageEnum fire(Cannon cannon, UUID playerUid, boolean autoload, boolean consumesAmmo, InteractAction action)
     {
         plugin.logDebug("fire cannon");
+
         //set some valid shooter is none is given
         if (playerUid == null) {
             playerUid = cannon.getOwner();
         }
-        Player player = Bukkit.getPlayer(playerUid);
+
+        Player player = null;
+        if (playerUid != null) {
+            player = Bukkit.getPlayer(playerUid);
+        }
+
         //fire event
         CannonUseEvent useEvent = new CannonUseEvent(cannon, playerUid, action);
         Bukkit.getServer().getPluginManager().callEvent(useEvent);
@@ -306,12 +312,19 @@ public class FireCannon {
         Projectile projectile = cannon.getLoadedProjectile();
 
         //the player might be null if not online
-        Player onlinePlayer = Bukkit.getPlayer(shooter);
+        Player onlinePlayer = null;
+        if (shooter != null) {
+            onlinePlayer = Bukkit.getPlayer(shooter);
+        }
 
         // no projectile no cannon firing
-        if (projectile == null) return;
+        if (projectile == null) {
+            return;
+        }
         // no gunpowder no cannon firing
-        if (cannon.getLoadedGunpowder() <= 0) return;
+        if (cannon.getLoadedGunpowder() <= 0) {
+            return;
+        }
 
         //increased fired cannonballs
         cannon.incrementFiredCannonballs();
@@ -338,8 +351,7 @@ public class FireCannon {
         {
             org.bukkit.projectiles.ProjectileSource source = null;
             Location playerLoc = null;
-            if (onlinePlayer != null)
-            {
+            if (onlinePlayer != null) {
                 source = onlinePlayer;
                 playerLoc = onlinePlayer.getLocation();
             }
@@ -369,7 +381,7 @@ public class FireCannon {
         //reset after firing
         cannon.setLastFired(System.currentTimeMillis());
         cannon.setSoot(cannon.getSoot() + design.getSootPerGunpowder()*cannon.getLoadedGunpowder());
-        
+
         if (removeCharge)
         {
             cannon.setProjectilePushed(design.getProjectilePushing());

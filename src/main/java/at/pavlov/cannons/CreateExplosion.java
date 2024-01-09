@@ -791,115 +791,121 @@ public class CreateExplosion {
      *            cannonball which will explode
      */
     public void detonate(FlyingProjectile cannonball, org.bukkit.entity.Projectile projectile_entity) {
-	this.plugin.logDebug("detonate cannonball");
+		this.plugin.logDebug("detonate cannonball");
 
-	Projectile projectile = cannonball.getProjectile().clone();
-	Player player = Bukkit.getPlayer(cannonball.getShooterUID());
+		Projectile projectile = cannonball.getProjectile().clone();
 
-	boolean canceled = false;
-	// breaks blocks from the impact of the projectile to the location of the
-	// explosion
-	Location impactLoc = this.blockBreaker(cannonball, projectile_entity);
-	// impactLoc = projectile_entity.getLocation();
-	cannonball.setImpactLocation(impactLoc);
-	World world = impactLoc.getWorld();
-
-
-	// find block which caused the shell impact
-	Location impactBlock = CannonsUtil.findFirstBlock(impactLoc, cannonball.getVelocity());
-	if (impactBlock != null) {
-	    cannonball.setImpactBlock(impactBlock);
-	    //this.plugin.logDebug("todo: impact block: " + impactBlock.getBlock());
-	}
-
-	// teleport snowball to impact
-	projectile_entity.teleport(impactLoc);
-
-	float explosion_power = projectile.getExplosionPower();
-	if (projectile.isExplosionPowerDependsOnVelocity()) {
-	    double vel = projectile_entity.getVelocity().length();
-	    double maxVel = projectile.getVelocity();
-	    double maxEnergy = Math.pow(maxVel, 2);
-	    double energy = Math.pow(vel, 2);
-	    explosion_power *= energy / maxEnergy;
-	}
-
-	// reset explosion power if it is underwater and not allowed
-	this.plugin.logDebug("Explosion is underwater: " + cannonball.wasInWater());
-	if (!projectile.isUnderwaterDamage() && cannonball.wasInWater()) {
-	    this.plugin.logDebug("Underwater explosion not allowed. Event cancelled");
-	    return;
-	}
-
-	// deflect cannonball
-	if (this.deflectProjectile(cannonball)) {
-	    // cannonball was deflected - no explosion
-	    this.plugin.logDebug("Cannonball was deflected");
-	    return;
-	}
-
-	boolean incendiary = projectile.hasProperty(ProjectileProperties.INCENDIARY);
-	boolean blockDamage = projectile.getExplosionDamage();
-
-	this.plugin.logDebug("Projectile impact event: " + impactLoc.getBlockX() + ", " + impactLoc.getBlockY() + ", "
-				+ impactLoc.getBlockZ() + " direction: " + impactLoc.getYaw() + " Pitch: " + impactLoc.getPitch());
-
-	// fire impact event
-	ProjectileImpactEvent impactEvent = new ProjectileImpactEvent(projectile, impactLoc,
-		cannonball.getShooterUID());
-	Bukkit.getServer().getPluginManager().callEvent(impactEvent);
-	canceled = impactEvent.isCancelled();
-
-	this.currentCannonball = cannonball;
-	// if canceled then exit
-	if (impactEvent.isCancelled()) {
-	    // event cancelled, make some effects - even if the area is protected by a
-	    // plugin
-	    world.createExplosion(impactLoc.getX(), impactLoc.getY(), impactLoc.getZ(), 0, false, false, cannonball.getProjectileEntity());
-	    this.sendExplosionToPlayers(projectile, impactLoc, projectile.getSoundImpactProtected());
-	} else {
-	    // if the explosion power is negative there will be only a arrow impact sound
-	    if (explosion_power >= 0) {
-			// get affected entities
-			for (Entity cEntity : projectile_entity.getNearbyEntities(explosion_power, explosion_power,
-				explosion_power)) {
-				this.addAffectedEntity(cEntity);
+		Player player = null;
+		UUID shooterUUID = cannonball.getShooterUID();
+		if (shooterUUID != null) {
+			player = Bukkit.getPlayer(shooterUUID);
 		}
-		// make the explosion
-		canceled = !world.createExplosion(impactLoc.getX(), impactLoc.getY(), impactLoc.getZ(), explosion_power,
-			incendiary, blockDamage, cannonball.getProjectileEntity());
-	    }
-	}
 
-	// send a message about the impact (only if the projectile has enabled this
-	// feature and a player fired this projectile)
-	if (projectile.isImpactMessage() && cannonball.getProjectileCause() == ProjectileCause.PlayerFired) {
-	    this.plugin.sendImpactMessage(player, impactLoc, canceled);
-	}
+		boolean canceled = false;
+		// breaks blocks from the impact of the projectile to the location of the
+		// explosion
+		Location impactLoc = this.blockBreaker(cannonball, projectile_entity);
+		// impactLoc = projectile_entity.getLocation();
+		cannonball.setImpactLocation(impactLoc);
+		World world = impactLoc.getWorld();
 
-	// do nothing if the projectile impact was canceled or it is underwater with
-	// deactivated
-	if (!canceled) {
-	    // if the player is too far away, there will be a imitated explosion made of
-	    // fake blocks
-	    this.sendExplosionToPlayers(projectile, impactLoc, projectile.getSoundImpact());
-	    // place blocks around the impact like webs, lava, water
-	    this.spreadBlocks(cannonball);
-	    // spawns additional projectiles after the explosion
-	    this.spawnProjectiles(cannonball);
-	    // spawn fireworks
-	    this.spawnFireworks(cannonball, projectile_entity);
-	    // do potion effects
-	    this.damageEntity(cannonball, projectile_entity);
-	    // teleport the player to the impact or to the start point
-	    this.teleportPlayer(cannonball, player);
-	    // make some additional explosion around the impact
-	    this.clusterExplosions(cannonball);
-	    // fire event for all kill entities
-	    this.fireEntityDeathEvent(cannonball);
-	    // place blocks around the impact like webs, lava, water
-	    this.spreadEntities(cannonball);
-	}
+		// find block which caused the shell impact
+		Location impactBlock = CannonsUtil.findFirstBlock(impactLoc, cannonball.getVelocity());
+		if (impactBlock != null) {
+			cannonball.setImpactBlock(impactBlock);
+			//this.plugin.logDebug("todo: impact block: " + impactBlock.getBlock());
+		}
+
+		// teleport snowball to impact
+		projectile_entity.teleport(impactLoc);
+
+		float explosion_power = projectile.getExplosionPower();
+		if (projectile.isExplosionPowerDependsOnVelocity()) {
+			double vel = projectile_entity.getVelocity().length();
+			double maxVel = projectile.getVelocity();
+			double maxEnergy = Math.pow(maxVel, 2);
+			double energy = Math.pow(vel, 2);
+			explosion_power *= energy / maxEnergy;
+		}
+
+		// reset explosion power if it is underwater and not allowed
+		this.plugin.logDebug("Explosion is underwater: " + cannonball.wasInWater());
+		if (!projectile.isUnderwaterDamage() && cannonball.wasInWater()) {
+			this.plugin.logDebug("Underwater explosion not allowed. Event cancelled");
+			return;
+		}
+
+		// deflect cannonball
+		if (this.deflectProjectile(cannonball)) {
+			// cannonball was deflected - no explosion
+			this.plugin.logDebug("Cannonball was deflected");
+			return;
+		}
+
+		boolean incendiary = projectile.hasProperty(ProjectileProperties.INCENDIARY);
+		boolean blockDamage = projectile.getExplosionDamage();
+
+		this.plugin.logDebug("Projectile impact event: " + impactLoc.getBlockX() + ", " + impactLoc.getBlockY() + ", "
+					+ impactLoc.getBlockZ() + " direction: " + impactLoc.getYaw() + " Pitch: " + impactLoc.getPitch());
+
+		// fire impact event
+		ProjectileImpactEvent impactEvent = new ProjectileImpactEvent(projectile, impactLoc,
+			cannonball.getShooterUID());
+		Bukkit.getServer().getPluginManager().callEvent(impactEvent);
+		canceled = impactEvent.isCancelled();
+
+		this.currentCannonball = cannonball;
+		// if canceled then exit
+		if (impactEvent.isCancelled()) {
+			// event cancelled, make some effects - even if the area is protected by a
+			// plugin
+			world.createExplosion(impactLoc.getX(), impactLoc.getY(), impactLoc.getZ(), 0, false, false, cannonball.getProjectileEntity());
+			this.sendExplosionToPlayers(projectile, impactLoc, projectile.getSoundImpactProtected());
+		} else {
+			// if the explosion power is negative there will be only a arrow impact sound
+			if (explosion_power >= 0) {
+				// get affected entities
+				for (Entity cEntity : projectile_entity.getNearbyEntities(explosion_power, explosion_power,
+					explosion_power)) {
+					this.addAffectedEntity(cEntity);
+			}
+			// make the explosion
+			canceled = !world.createExplosion(impactLoc.getX(), impactLoc.getY(), impactLoc.getZ(), explosion_power,
+				incendiary, blockDamage, cannonball.getProjectileEntity());
+			}
+		}
+
+		// send a message about the impact (only if the projectile has enabled this
+		// feature and a player fired this projectile)
+		if (projectile.isImpactMessage() && cannonball.getProjectileCause() == ProjectileCause.PlayerFired && player != null) {
+			this.plugin.sendImpactMessage(player, impactLoc, canceled);
+		}
+
+		// do nothing if the projectile impact was canceled or it is underwater with
+		// deactivated
+		if (!canceled) {
+			// if the player is too far away, there will be a imitated explosion made of
+			// fake blocks
+			this.sendExplosionToPlayers(projectile, impactLoc, projectile.getSoundImpact());
+			// place blocks around the impact like webs, lava, water
+			this.spreadBlocks(cannonball);
+			// spawns additional projectiles after the explosion
+			this.spawnProjectiles(cannonball);
+			// spawn fireworks
+			this.spawnFireworks(cannonball, projectile_entity);
+			// do potion effects
+			this.damageEntity(cannonball, projectile_entity);
+			if (player != null) {
+				// teleport the player to the impact or to the start point
+				this.teleportPlayer(cannonball, player);
+			}
+			// make some additional explosion around the impact
+			this.clusterExplosions(cannonball);
+			// fire event for all kill entities
+			this.fireEntityDeathEvent(cannonball);
+			// place blocks around the impact like webs, lava, water
+			this.spreadEntities(cannonball);
+		}
     }
 
     private void fireEntityDeathEvent(FlyingProjectile cannonball) {

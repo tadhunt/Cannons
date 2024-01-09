@@ -778,7 +778,12 @@ public class CannonsUtil
         if (cannonball == null)
             return;
 
-        Player player = Bukkit.getPlayer(cannonball.getShooterUID());
+        UUID shooterUUID = cannonball.getShooterUID();
+        if (shooterUUID == null) {
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(shooterUUID);
         if (player == null)
             return;
 

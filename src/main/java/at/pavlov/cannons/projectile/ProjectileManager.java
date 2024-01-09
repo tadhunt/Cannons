@@ -28,7 +28,6 @@ public class ProjectileManager
 
     public org.bukkit.entity.Projectile spawnProjectile(Projectile projectile, UUID shooter, org.bukkit.projectiles.ProjectileSource source, Location playerLoc, Location spawnLoc, Vector velocity, UUID cannonId, ProjectileCause projectileCause)
     {
-        Validate.notNull(shooter, "shooter for the projectile can't be null");
         World world = spawnLoc.getWorld();
 
         //set yaw, pitch for fireballs
@@ -174,10 +173,14 @@ public class ProjectileManager
      */
     public FlyingProjectile getAttachedProjectile(Player player)
     {
-        if (player != null)
-            for (FlyingProjectile proj : flyingProjectilesMap.values())
-                if (proj.getShooterUID().equals(player.getUniqueId()))
+        if (player != null) {
+            for (FlyingProjectile proj : flyingProjectilesMap.values()) {
+                if (proj.getShooterUID().equals(player.getUniqueId())) {
                     return proj;
+                }
+            }
+        }
+
         return null;
     }
 }

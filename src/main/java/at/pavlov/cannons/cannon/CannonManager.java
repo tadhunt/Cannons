@@ -686,7 +686,7 @@ public class CannonManager
 		{
 			if (cannon.getOwner() == null)
 			{
-				plugin.logSevere("Cannon has no owner. Contact the plugin developer");
+				plugin.logDebug(String.format("Cannon %s has no owner.", cannon.getUID()));
 			}
 			else if (cannon.getOwner().equals(player))
 			{

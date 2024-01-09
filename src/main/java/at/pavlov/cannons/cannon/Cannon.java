@@ -646,8 +646,7 @@ public class Cannon
      */
     private MessageEnum CheckPermProjectile(Projectile projectile, Player player)
     {
-        if (player != null)
-        {
+        if (player != null) {
             //if the player is not the owner of this gun
             if (this.getOwner()!=null && !this.getOwner().equals(player.getUniqueId()) && design.isAccessForOwnerOnly())
                 return MessageEnum.ErrorNotTheOwner;
