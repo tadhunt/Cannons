@@ -10,7 +10,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 
@@ -26,6 +25,8 @@ public class ItemHolder
 	private static Class craftItemStackClass = null, nmsItemStackClass = null, nmsItemClass = null;
 	private static String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
 	private static String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+
+	private Cannons plugin = Cannons.getPlugin();
 
 	public ItemHolder(ItemStack item)
 	{
@@ -119,7 +120,7 @@ public class ItemHolder
         }
         catch(Exception e)
         {
-            System.out.println("[CANNONS] Error while converting " + str + ". Check formatting (minecraft:clock)");
+            plugin.logInfo("Error while converting " + str + ". Check formatting (minecraft:clock)");
         }
 	}
 	
@@ -189,7 +190,7 @@ public class ItemHolder
 	{
 		if (item != null)
 		{
-			//System.out.println("item: " + item.getDisplayName() + " cannons " + this.getDisplayName());
+			//plugin.logInfo("item: " + item.getDisplayName() + " cannons " + this.getDisplayName());
             //Item does not have the required display name
             if ((this.hasDisplayName() && !item.hasDisplayName()) || (!this.hasDisplayName() && item.hasDisplayName()))
                 return false;
@@ -221,7 +222,7 @@ public class ItemHolder
 	 */
 	public boolean equalsFuzzy(Block block)
 	{
-		//System.out.println("id:" + item.getId() + "-" + id + " data:" + item.getData() + "-" + data);
+		//plugin.logInfo("id:" + item.getId() + "-" + id + " data:" + item.getData() + "-" + data);
 		if (block != null)
 		{
 			if (block.getType().equals(this.material))

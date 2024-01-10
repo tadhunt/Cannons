@@ -150,6 +150,7 @@ public class Cannon
     // redstone handling event. Last player that pressed the firing button is saved in this list for the next redstone event
     private String firingButtonActivator;
 
+    private Cannons plugin = Cannons.getPlugin();
 
     public Cannon(CannonDesign design, UUID world, Vector cannonOffset, BlockFace cannonDirection, UUID owner)
     {
@@ -283,7 +284,7 @@ public class Cannon
             if (toLoad > 0)
             {
                 ItemStack gunpowder = design.getGunpowderType().toItemStack(toLoad);
-                Cannons.getPlugin().logDebug("Amount of chests next to cannon: " + invlist.size());
+                plugin.logDebug("Amount of chests next to cannon: " + invlist.size());
                 gunpowder = InventoryManagement.removeItem(invlist, gunpowder);
                 if (gunpowder.getAmount() == 0)
                 {
@@ -493,7 +494,7 @@ public class Cannon
                     gunpowder = maximumLoadableNormal;
                 else
                     gunpowder = 0;
-                System.out.println("[Cannons] gunpowder: " + gunpowder);
+                plugin.logInfo("gunpowder: " + gunpowder);
             }
 
             //load the gunpowder
@@ -901,7 +902,7 @@ public class Cannon
 
             if (wBlock.getState() instanceof Attachable)
             {
-                //System.out.println("hide " + wBlock.getType());
+                //plugin.logInfo("hide " + wBlock.getType());
                 wBlock.setType(Material.AIR);
                 //wBlock.setData((byte) 0, false);
             }
@@ -1754,7 +1755,7 @@ public class Cannon
         {
             World bukkitWorld = Bukkit.getWorld(this.world);
             if (bukkitWorld == null)
-                System.out.println("[Cannons] Can't find world: " + world);
+                plugin.logInfo("Can't find world: " + world);
             return Bukkit.getWorld(this.world);
             // return new Location(bukkitWorld, )
         }

@@ -541,6 +541,7 @@ public class CannonsUtil
      */
     public static void imitateSound(Location loc, SoundHolder sound, int maxDist, float maxVolume)
     {
+        //Cannons plugin = Cannons.getPlugin();
         //https://forums.bukkit.org/threads/playsound-parameters-volume-and-pitch.151517/
         World w = loc.getWorld();
         //w.playSound(loc, sound.getSound(), maxVolume*16f, sound.getPitch());
@@ -562,7 +563,7 @@ public class CannonsUtil
                 float maxv = d/(1-maxVolume)/16f;
                 maxv = Math.max(maxv, maxVolume);
                 float setvol = Math.min(maxv, (float)maxDist/16f);
-                //System.out.println("distance: " + d + "maxv: " + maxv + " (float)maxDist/16f: " + (float)maxDist/16f + " setvol: " + setvol);
+                //plugin.logInfo("distance: " + d + "maxv: " + maxv + " (float)maxDist/16f: " + (float)maxDist/16f + " setvol: " + setvol);
                 if (sound.isSoundEnum())
                     p.playSound(loc, sound.getSoundEnum(), setvol, newPitch);
                 if (sound.isSoundString())
@@ -733,7 +734,8 @@ public class CannonsUtil
                 nontransparent ++;
             }
         }
-        //System.out.println("non transperent blocks: " + nontransparent);
+        //Cannons plugin = Cannons.getPlugin();
+        //plugin.logInfo("non transperent blocks: " + nontransparent);
         return nontransparent <= ignoredBlocks;
     }
 
@@ -881,8 +883,9 @@ public class CannonsUtil
         double hx = -Math.cos(pitch * Math.PI / 180.)*Math.sin(yaw*Math.PI/180.);
         double hy = -Math.sin(pitch * Math.PI / 180.);
         double hz = Math.cos(pitch*Math.PI/180.)*Math.cos(yaw*Math.PI/180.);
-//        System.out.println("yaw: " + yaw + " pitch " + pitch);
-//        System.out.println("vector: " + (new Vector(hx, hy, hz)));
+//    	  Cannons plugin = Cannons.getPlugin();
+//        plugin.logInfo("yaw: " + yaw + " pitch " + pitch);
+//        plugin.logInfo("vector: " + (new Vector(hx, hy, hz)));
         return new Vector(hx, hy, hz).multiply(speed);
     }
 
@@ -1040,11 +1043,13 @@ public class CannonsUtil
         else
             //impact was above
             plane = -0.5;
-        System.out.println("impact: " + imb + " rv: " + rv + " direction " + direction + " plane: " + plane);
+
+	    Cannons plugin = Cannons.getPlugin();
+        plugin.logInfo("impact: " + imb + " rv: " + rv + " direction " + direction + " plane: " + plane);
         double t = (plane - rv.getY())/direction.getY();
         Vector is = direction.clone().multiply(t).add(rv);
         //detect if is within bonds
-        System.out.println("isurface: " + is);
+        plugin.logInfo("isurface: " + is);
         if (is.getX() > -0.5 && is.getX() < 0.5 && is.getZ() > -0.5 && is.getZ() < 0.5){
             return new Vector(0,1,0);
         }
@@ -1078,7 +1083,8 @@ public class CannonsUtil
             return Bukkit.createBlockData(str);
         }
         catch(Exception e){
-            System.out.println("[Cannons] block data '" + str + "' is not valid");
+            Cannons plugin = Cannons.getPlugin();
+            plugin.logInfo("block data '" + str + "' is not valid");
             return Material.AIR.createBlockData();
         }
     }

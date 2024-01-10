@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
+import at.pavlov.cannons.Cannons;
+
 import java.util.Scanner;
 import java.util.regex.MatchResult;
 
@@ -11,6 +13,8 @@ public class SpawnMaterialHolder {
     private BlockData material;
     private int minAmount;
     private int maxAmount;
+
+	private Cannons plugin = Cannons.getPlugin();
 
     public SpawnMaterialHolder(String str)
     {
@@ -29,7 +33,7 @@ public class SpawnMaterialHolder {
         }
         catch(Exception e)
         {
-            System.out.println("Error while converting " + str + ". Check formatting (minecraft:cobweb 1-2)");
+            plugin.logSevere("Error while converting " + str + ". Check formatting (minecraft:cobweb 1-2)");
             material =  Bukkit.createBlockData(Material.AIR);
             setMinAmount(0);
             setMaxAmount(0);

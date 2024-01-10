@@ -19,6 +19,8 @@ public class SpawnEntityHolder{
     private Map<EntityDataType, String> data;
     private List<PotionEffect> potionEffects;
 
+	private Cannons plugin = Cannons.getPlugin();
+
     public SpawnEntityHolder(String str)
     {
         //split string at space
@@ -109,7 +111,7 @@ public class SpawnEntityHolder{
                                                 icon = Boolean.parseBoolean(val);
                                                 break;
                                             default:
-                                                System.out.println("[Cannons] '" + s3[0] + "' is not a correct potion effect argument. See Bukkit PotionType");
+                                                plugin.logSevere(s3[0] + "' is not a correct potion effect argument. See Bukkit PotionType");
                                         }
                                     }
                                 }
@@ -128,20 +130,20 @@ public class SpawnEntityHolder{
                                 }
                             }
                             if (!found)
-                                System.out.println("[Cannons] '" + s2[0] + "' is not supported by Cannons");
+                                plugin.logSevere(s2[0] + "' is not supported by Cannons");
                         }
                     }
                     else{
-                        System.out.println("[Cannons] " + s1 + " does not have an argument, use 'DURATION:10'");
+                        plugin.logSevere(s1 + " does not have an argument, use 'DURATION:10'");
                     }
                 }
             }
             s.close();
-            System.out.println("[Cannons] type: " + getType() + " data: " + getData() + " min: " + minAmount + " max: " + maxAmount + " from str: " + str);
+            plugin.logInfo("type: " + getType() + " data: " + getData() + " min: " + minAmount + " max: " + maxAmount + " from str: " + str);
         }
         catch(Exception e)
         {
-            System.out.println("[Cannons] Error while converting " + str + ". Check formating (Zombie 1-2 EntityData)" + e);
+            plugin.logSevere("Error while converting " + str + ". Check formating (Zombie 1-2 EntityData)" + e);
             setType(null);
             setMinAmount(0);
             setMaxAmount(0);

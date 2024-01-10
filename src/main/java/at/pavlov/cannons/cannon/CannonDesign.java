@@ -12,6 +12,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.container.ItemHolder;
 import at.pavlov.cannons.container.SimpleBlock;
 import at.pavlov.cannons.projectile.Projectile;
@@ -189,7 +190,7 @@ public class CannonDesign
     //cannon design block lists for every direction (NORTH, EAST, SOUTH, WEST)
     private HashMap<BlockFace, CannonBlocks> cannonBlockMap = new HashMap<BlockFace, CannonBlocks>();
 
-
+	private Cannons plugin = Cannons.getPlugin();
     
     /**
      * returns the rotation center of a cannon design
@@ -204,7 +205,7 @@ public class CannonDesign
     		return cannonBlocks.getRotationCenter().clone().add(cannon.getOffset()).toLocation(cannon.getWorldBukkit());
     	}
     	
-    	System.out.println("[Cannons] missing rotation center for cannon design " + cannon.getCannonName());
+    	plugin.logInfo("missing rotation center for cannon design " + cannon.getCannonName());
     	return cannon.getOffset().toLocation(cannon.getWorldBukkit());
     } 
     
@@ -222,7 +223,7 @@ public class CannonDesign
     		return cannonBlocks.getMuzzle().clone().add(cannon.getOffset()).toLocation(cannon.getWorldBukkit());
     	}
 
-    	System.out.println("[Cannons] missing muzzle location for cannon design " + cannon.getCannonName());
+    	plugin.logInfo("missing muzzle location for cannon design " + cannon.getCannonName());
     	return cannon.getOffset().toLocation(cannon.getWorldBukkit());
     }
     

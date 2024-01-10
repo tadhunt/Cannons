@@ -2,6 +2,8 @@ package at.pavlov.cannons.container;
 
 import org.bukkit.Sound;
 
+import at.pavlov.cannons.Cannons;
+
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -10,6 +12,8 @@ public class SoundHolder {
     private String soundstr;
     private Float volume;
     private Float pitch;
+
+	private Cannons plugin = Cannons.getPlugin();
 
     public SoundHolder(String str)
     {
@@ -38,21 +42,21 @@ public class SoundHolder {
                     }
             }
             else
-                System.out.println("missing sound value in: " + str);
+                plugin.logSevere("missing sound value in: " + str);
 
             if (s.hasNextFloat())
                 volume = s.nextFloat();
             else
-                System.out.println("missing volume value in: " + str);
+                plugin.logSevere("missing volume value in: " + str);
             if (s.hasNextFloat())
                 pitch = s.nextFloat();
             else
-                System.out.println("missing pitch value in: " + str);
+                plugin.logSevere("missing pitch value in: " + str);
             s.close();
         }
         catch(Exception e)
         {
-            System.out.println("Error while converting " + str + ". Formatting: 'IRON_GOLEM_WALK:1:0.5'" + e.toString());
+            plugin.logSevere("Error while converting " + str + ". Formatting: 'IRON_GOLEM_WALK:1:0.5'" + e.toString());
         }
     }
 

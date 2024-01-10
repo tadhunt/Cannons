@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
+import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.container.ItemHolder;
 
 
@@ -105,6 +106,8 @@ public class Projectile implements Cloneable{
 	//permissions
 	private List<String> permissionLoad = new ArrayList<String>();
 
+	private Cannons plugin = Cannons.getPlugin();
+
 	public Projectile(String id)
 	{
 		this.projectileID = id;
@@ -119,7 +122,7 @@ public class Projectile implements Cloneable{
 		}
 		catch(CloneNotSupportedException e)
 		{
-			System.out.println("Cloning not allowed.");
+			plugin.logSevere("Cloning not allowed.");
 			return this;
 		}
 	}
