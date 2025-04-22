@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import at.pavlov.cannons.container.SoundHolder;
-import at.pavlov.cannons.projectile.ProjectileStorage;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -1055,21 +1054,39 @@ public class CannonDesign
     }
 
     /**
-     * returns the used used item. E.g. a water bucket will be an empty bucket.
+     * returns the used item. E.g. a water bucket will be an empty bucket.
      * @param item - the item used for the event
      * @return the new item which replaces the old one
      */
     public ItemStack getCoolingToolUsed(ItemStack item)
     {
-        for (int i=0; i < itemCooling.size(); i++)
-        {
+        for (int i=0; i < itemCooling.size(); i++) {
+			ItemHolder coolingItem = itemCooling.get(i);
+			ItemHolder replacementItem = itemCoolingUsed.get(i);
+
+			//plugin.logInfo(String.format("cooling item: %s replacement %s", coolingItem.toString(), replacementItem.toString()));
+
 			//todo rework tool properties
-            if (itemCooling.get(i).equalsFuzzy(item))
-            {
-                return itemCoolingUsed.get(i).toItemStack(item.getAmount());
+            if (coolingItem.equalsFuzzy(item)) {
+				//plugin.logInfo(String.format("cooling item: %s replacement %s", coolingItem.toString(), replacementItem.toString()));
+                return replacementItem.toItemStack(item.getAmount());
             }
         }
+
         return null;
+    }
+	   
+
+    /**
+     * returns the used item. E.g. a water bucket will be an empty bucket.
+     * @param item - the item used for the event
+     * @return the new item which replaces the old one
+     */
+    public ItemStack getCoolingToolUsed(ItemHolder coolingItem, int amount)
+    {
+		ItemStack stack = coolingItem.toItemStack(amount);
+
+		return getCoolingToolUsed(stack);
     }
 
     public boolean isAutomaticTemperatureControl() {

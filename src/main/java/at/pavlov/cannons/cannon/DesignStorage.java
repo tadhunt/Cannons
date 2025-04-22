@@ -9,14 +9,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
-import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
-import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -374,7 +370,12 @@ public class DesignStorage
 		// load schematic with worldedit
         Clipboard cc;
         File f = new File(getPath() + schematicFile);
+		
 		ClipboardFormat format = ClipboardFormats.findByFile(f);
+		if (format == null) {
+			plugin.logSevere("Schematic format not found for " + f.getName());
+			return false;
+		}
 		try (Closer closer = Closer.create()) {
 			FileInputStream fis = closer.register(new FileInputStream(f));
 			BufferedInputStream bis = closer.register(new BufferedInputStream(fis));

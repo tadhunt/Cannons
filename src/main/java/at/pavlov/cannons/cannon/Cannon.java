@@ -9,7 +9,7 @@ import at.pavlov.cannons.event.CannonUseEvent;
 import at.pavlov.cannons.Enum.InteractAction;
 import at.pavlov.cannons.projectile.ProjectileStorage;
 import at.pavlov.cannons.utils.CannonsUtil;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -344,42 +344,72 @@ public class Cannon
     }
 
     /**
-     * removes cooling item form the chest attached to the cannon, returns true if it was enough to cool down the cannon
-     * @return - true if the cannon has been cooled down
+     * removes as many cooling items from the chests attached to the cannon as possible,
+     * replaces them with the "used" equivalent (or nothing if the used equivalent is AIR)
+     * @return true if the cannon has been cooled down below the warning temperature, otherwise false.
      */
     public boolean automaticCoolingFromChest()
     {
-
         List<Inventory> invlist = getInventoryList();
 
-        //cooling items will be consumed from the inventory
-        int toCool = (int) Math.ceil((this.getTemperature() - design.getWarningTemperature())/design.getCoolingAmount());
-        ItemStack item = new ItemStack(Material.AIR, toCool);
-
-        if (toCool <= 0)
+        // determine the maximum number of items we need to fully cool the cannon.
+        int maxCool = (int) Math.ceil((this.getTemperature() - design.getWarningTemperature())/design.getCoolingAmount());
+        if (maxCool <= 0) {
             return true;
-
-        //do this for every cooling item
-        for (ItemHolder mat : design.getItemCooling())
-        {
-            item = mat.toItemStack(item.getAmount());
-            item = InventoryManagement.removeItem(invlist, item);
-
-
-            int usedItems= toCool - item.getAmount();
-            this.setTemperature(this.getTemperature()-usedItems*design.getCoolingAmount());
-
-            //put used items back to the chest (not if the item is AIR)
-            ItemStack itemUsed = design.getCoolingToolUsed(item);
-            itemUsed.setAmount(usedItems);
-            if (!itemUsed.getType().equals(Material.AIR))
-                InventoryManagement.addItemInChests(invlist, itemUsed);
-
-            //if all items have been removed we are done
-            if (item.getAmount() == 0)
-                return true;
         }
-        return false;
+
+        List<ItemHolder> coolingMaterials = design.getItemCooling();
+
+        // keep looking for cooling items until we have fully cooled down or run out of items
+        for(int i = 0; i < coolingMaterials.size(); i++) {
+            // look for this material
+            ItemHolder coolingMaterial = coolingMaterials.get(i);
+            if (coolingMaterial.getType().equals(Material.AIR)) {
+                // ignore cooling material type air
+                continue;
+            }
+
+            int nFound = this.removeCoolingItemsFromInvList(invlist, coolingMaterial, maxCool);
+            if (nFound <= 0) {
+                // no items found, continue to the next type of cooling item
+                continue;
+            }
+
+            this.setTemperature(this.getTemperature()-nFound*design.getCoolingAmount());
+
+            ItemStack replacementItems = design.getCoolingToolUsed(coolingMaterial, nFound);
+
+            if (!replacementItems.getType().equals(Material.AIR)) {
+                InventoryManagement.addItemInChests(invlist, replacementItems);
+            }
+
+            maxCool -= nFound;
+            if (maxCool <= 0) {
+                // we have cooled down enough
+                break;
+            }  
+        }
+
+        return maxCool <= 0;
+    }
+
+
+    /**
+     * removes cooling items from the inventory list
+     * @param invlist
+     * @param material
+     * @param maxItems
+     * @return number of items removed
+     */
+    public int removeCoolingItemsFromInvList(List<Inventory> invlist, ItemHolder material, int maxItems) {
+            // make a stack big enough to hold maxItems items
+            ItemStack items = material.toItemStack(maxItems);
+
+            // Extract up to maxItems items from the inventories.
+            // Note that the returned items.getAmount() is number of items *not* extracted
+            items = InventoryManagement.removeItem(invlist, items);
+
+            return maxItems - items.getAmount();
     }
 
 
@@ -1130,7 +1160,7 @@ public class Cannon
                 // compare location
                 if (cannonblock.toLocation(this.getWorldBukkit(),this.offset).equals(loc))
                 {
-                    Block block = loc.getBlock();
+                    //Block block = loc.getBlock();
                     //compare and data
                     //only the two lower bits of the bytes are important for the direction (delays are not interessting here)
                     //if (cannonblock.getData() == block.getData() %4 || block.getData() == -1 || cannonblock.getData() == -1 )

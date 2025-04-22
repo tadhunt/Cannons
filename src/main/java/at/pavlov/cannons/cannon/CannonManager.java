@@ -12,7 +12,7 @@ import at.pavlov.cannons.event.CannonDestroyedEvent;
 import at.pavlov.cannons.utils.CannonsUtil;
 import at.pavlov.cannons.utils.DelayedTask;
 import at.pavlov.cannons.utils.RemoveTaskWrapper;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -49,6 +49,7 @@ public class CannonManager
 	 * removes a cannons from the list that are not valid
      * @param cause the reason why the cannon is removed
 	 */
+/*
 	private void removeInvalidCannons(BreakCause cause)
 	{
 		Iterator<Cannon> iter = cannonList.values().iterator();
@@ -63,6 +64,7 @@ public class CannonManager
 			}
 		}
 	}
+*/
 
     /**
      * deconstructs a cannon without the risk of explosion

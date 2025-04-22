@@ -61,7 +61,8 @@ public class InventoryManagement
      */
     public static ItemStack removeItem(List<Inventory> invlist, ItemStack item)
     {
-        if (item == null) return null;
+        if (item == null)
+            return null;
 
         Iterator<Inventory> iter = invlist.iterator();
         while (iter.hasNext() && item.getAmount() > 0)
@@ -84,7 +85,7 @@ public class InventoryManagement
     public static ItemStack removeItem(Inventory inv, ItemStack item)
     {
         if (inv == null || item == null)
-            return item;
+            return null;
 
         HashMap<Integer, ItemStack> itemMap = inv.removeItem(item);
 

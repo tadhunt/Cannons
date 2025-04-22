@@ -29,7 +29,6 @@ import at.pavlov.cannons.Enum.FakeBlockType;
 import at.pavlov.cannons.Enum.ProjectileCause;
 import at.pavlov.cannons.config.Config;
 import at.pavlov.cannons.container.DeathCause;
-import at.pavlov.cannons.container.ItemHolder;
 import at.pavlov.cannons.container.SoundHolder;
 import at.pavlov.cannons.container.SpawnEntityHolder;
 import at.pavlov.cannons.container.SpawnMaterialHolder;
@@ -120,8 +119,7 @@ public class CreateExplosion {
      * @return the location after the piercing event
      */
     private Location blockBreaker(FlyingProjectile cannonball, org.bukkit.entity.Projectile projectile_entity) {
-	Projectile projectile = cannonball.getProjectile();
-
+		Projectile projectile = cannonball.getProjectile();
 
 		// has this projectile the super breaker property and makes block damage
 		Boolean superbreaker = projectile.hasProperty(ProjectileProperties.SUPERBREAKER);
@@ -187,7 +185,7 @@ public class CreateExplosion {
 				this.plugin.getServer().getPluginManager().callEvent(piercingEvent);
 
 				// create bukkit event
-				EntityExplodeEvent event = new EntityExplodeEvent(projectile_entity, impactLoc, piercingEvent.getBlockList(), 1.0f);
+				EntityExplodeEvent event = new EntityExplodeEvent(projectile_entity, impactLoc, piercingEvent.getBlockList(), 1.0f, ExplosionResult.DESTROY);
 				this.plugin.getServer().getPluginManager().callEvent(event);
 
 				this.plugin.logDebug("was the cannons explode event canceled: " + event.isCancelled());
@@ -456,7 +454,6 @@ public class CreateExplosion {
 		Projectile projectile = cannonball.getProjectile();
 		Location impactLoc = cannonball.getImpactLocation();
 
-		Random r = new Random();
 		Location placeLoc;
 
 		double spread = projectile.getSpawnEntityRadius();
@@ -536,7 +533,6 @@ public class CreateExplosion {
 	Projectile projectile = cannonball.getProjectile();
 	Location impactLoc = cannonball.getImpactLocation();
 
-	Random r = new Random();
 	Location placeLoc;
 
 	double spread = projectile.getSpawnBlockRadius();
@@ -1093,8 +1089,6 @@ public class CreateExplosion {
 	// if (!cannonball.getProjectile().isSpawnEnabled())
 	// return;
 
-	Random r = new Random();
-	Location impactLoc = cannonball.getImpactLocation();
 	Location impactBlock = cannonball.getImpactBlock();
 	if (impactBlock == null)
 	    return false;
@@ -1125,12 +1119,6 @@ public class CreateExplosion {
 		FlyingProjectile cannonball = (FlyingProjectile) object;
 
 		Projectile projectile = cannonball.getProjectile();
-
-		Random r = new Random();
-
-		Location impactBlock = cannonball.getImpactBlock();
-		Vector vnormal = CannonsUtil.detectImpactSurfaceNormal(cannonball.getImpactLocation().toVector(),
-			cannonball.getVelocity().clone());
 
 		Vector vectdeflect = cannonball.getVelocity().multiply(.5);
 		Location impactLoc = cannonball.getImpactLocation()
@@ -1219,7 +1207,7 @@ public class CreateExplosion {
 	}
 
 	// apply to rocket
-	final Firework fw = (Firework) world.spawnEntity(projectile_entity.getLocation(), EntityType.FIREWORK);
+	final Firework fw = (Firework) world.spawnEntity(projectile_entity.getLocation(), EntityType.FIREWORK_ROCKET);
 	FireworkMeta meta = fw.getFireworkMeta();
 
 	meta.addEffect(fwb.build());

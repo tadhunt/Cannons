@@ -13,7 +13,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 
-import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,11 +158,11 @@ public class Config
         //imitated explosions particles
         setImitatedExplosionParticlesEnabled(plugin.getConfig().getBoolean("imitatedEffects.explosionParticles.enabled", true));
         try {
-            setImitatedExplosionParticlesType(Particle.valueOf(plugin.getConfig().getString("imitatedEffects.explosionParticles.type", "EXPLOSION_LARGE")));
+            setImitatedExplosionParticlesType(Particle.valueOf(plugin.getConfig().getString("imitatedEffects.explosionParticles.type", "EXPLOSION")));
         }
         catch(Exception e){
             plugin.logSevere("Type for Explosion particle  is not correct. Please check spelling of " + plugin.getConfig().getString("imitatedEffects.explosionParticles.type"));
-            setImitatedExplosionParticlesType(Particle.EXPLOSION_LARGE);
+            setImitatedExplosionParticlesType(Particle.EXPLOSION);
         }
         setImitatedExplosionParticlesCount(plugin.getConfig().getInt("imitatedEffects.explosionParticles.count", 5));
         setImitatedExplosionParticlesDiameter(plugin.getConfig().getDouble("imitatedEffects.explosionParticles.diameter", 1));

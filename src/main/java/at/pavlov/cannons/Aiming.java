@@ -1365,9 +1365,9 @@ public class Aiming {
      * @param target target of the cannon
      * @return angles for the cannon
      */
-    private GunAngles calctSentrySolution(Cannon cannon, Location target){
-        return new GunAngles(0., 0.);
-    }
+//    private GunAngles calctSentrySolution(Cannon cannon, Location target){
+//        return new GunAngles(0., 0.);
+//    }
 
 	/**
 	 * returns true if the player is currently in aiming mode

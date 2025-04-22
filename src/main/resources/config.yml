@@ -77,7 +77,7 @@ imitatedEffects:
     #are imitated particles enabled
     enabled: true
     #particle type. Check https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html for reference
-    type: EXPLOSION_LARGE
+    type: EXPLOSION
     #number of particles for the explosion
     count: 5
     #diameter of the explosion from distance

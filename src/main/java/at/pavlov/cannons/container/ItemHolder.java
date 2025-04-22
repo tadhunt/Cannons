@@ -1,7 +1,7 @@
 package at.pavlov.cannons.container;
 
 import at.pavlov.cannons.Cannons;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,7 +19,6 @@ public class ItemHolder
 	private Material material;
 	private String displayName;
 	private List<String> lore;
-	private boolean useTypeName;
 
 	private static Class localeClass = null;
 	private static Class craftItemStackClass = null, nmsItemStackClass = null, nmsItemClass = null;
@@ -30,7 +29,6 @@ public class ItemHolder
 
 	public ItemHolder(ItemStack item)
 	{
-		useTypeName = false;
         if (item == null){
             material=Material.AIR;
             displayName="";
@@ -45,7 +43,6 @@ public class ItemHolder
 			if (meta.hasDisplayName() && meta.getDisplayName()!=null)
 				displayName = meta.getDisplayName();
 			else if (!meta.hasDisplayName()){
-				useTypeName = true;
 				displayName = getFriendlyName(item, true);
 				//Cannons.getPlugin().logDebug("display name: " + displayName);
 			}
@@ -188,31 +185,38 @@ public class ItemHolder
 	 */	
 	public boolean equalsFuzzy(ItemHolder item)
 	{
-		if (item != null)
-		{
-			//plugin.logInfo("item: " + item.getDisplayName() + " cannons " + this.getDisplayName());
-            //Item does not have the required display name
-            if ((this.hasDisplayName() && !item.hasDisplayName()) || (!this.hasDisplayName() && item.hasDisplayName()))
-                return false;
-            //Display name do not match
-            if (item.hasDisplayName() && this.hasDisplayName() && !item.getDisplayName().equals(displayName))
+		if (item == null) {
+			return false;
+		}
+
+		if (this.hasDisplayName() != item.hasDisplayName()) {
+			return false;
+		}
+
+		if (this.hasDisplayName()) {
+			if (!item.getDisplayName().equals(displayName)) {
+				// Display names do not match
 				return false;
+			}
+		}
 
-            if (this.hasLore()) {
-                //does Item have a Lore
-                if (!item.hasLore())
-                    return false;
+		if (this.hasLore()) {
+			if (!item.hasLore()) {
+				// mismatch: item doesn't have a Lore
+				return false;
+			}
 
-                Collection<String> similar = new HashSet<String>(this.lore);
+			Collection<String> similar = new HashSet<String>(this.lore);
 
-                int size = similar.size();
-                similar.retainAll(item.getLore());
-                if (similar.size() < size)
-                    return false;
-            }
-			return item.getType().equals(this.material);
-		}	
-		return false;
+			int origSize = similar.size();
+			similar.retainAll(item.getLore());
+			if (similar.size() < origSize) {
+				// item lore is not a superset of this lore
+				return false;
+			}
+		}
+
+		return item.getType().equals(this.material);
 	}
 	
 	/**
